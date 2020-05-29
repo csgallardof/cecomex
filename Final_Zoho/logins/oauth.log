@@ -113,3 +113,14 @@
 2020-05-22 14:09:07,762 - Client_Library_OAUTH - ERROR - Exception occured while fetching oauthtoken from db; Exception Message::Refresh token not provided!
 2020-05-22 14:10:52,680 - Client_Library_OAUTH - INFO - Access token expired hence refreshing; Exception Message::Access token got expired!
 2020-05-23 08:25:57,957 - Client_Library_OAUTH - INFO - Access token expired hence refreshing; Exception Message::Access token got expired!
+2020-05-29 12:33:13,766 - Client_Library_OAUTH - INFO - Access token expired hence refreshing; Exception Message::unsupported operand type(s) for -: 'NoneType' and 'int'
+2020-05-29 12:33:13,767 - Client_Library_OAUTH - ERROR - Exception occured while fetching oauthtoken from db; Exception Message::Refresh token not provided!
+2020-05-29 12:33:13,767 - Client_Library_OAUTH - ERROR - Exception occured while fetching oauthtoken from db; Exception Message::Refresh token not provided!
+2020-05-29 12:34:20,811 - Client_Library_OAUTH - ERROR - Exception occured while generating access token; Exception Message::Exception occured while fetching accesstoken from Grant Token;Response is:{'error': 'invalid_code'}
+2020-05-29 12:49:53,578 - Client_Library_OAUTH - ERROR - Exception occured while generating access token; Exception Message::Exception occured while fetching accesstoken from Grant Token;Response is:{'error': 'invalid_code'}
+2020-05-29 12:55:04,480 - Client_Library_OAUTH - INFO - Access token expired hence refreshing; Exception Message::unsupported operand type(s) for -: 'NoneType' and 'int'
+2020-05-29 12:55:04,480 - Client_Library_OAUTH - ERROR - Exception occured while fetching oauthtoken from db; Exception Message::Refresh token not provided!
+2020-05-29 12:55:04,480 - Client_Library_OAUTH - ERROR - Exception occured while fetching oauthtoken from db; Exception Message::Refresh token not provided!
+2020-05-29 13:04:53,770 - Client_Library_OAUTH - INFO - Access token expired hence refreshing; Exception Message::unsupported operand type(s) for -: 'NoneType' and 'int'
+2020-05-29 13:04:53,772 - Client_Library_OAUTH - ERROR - Exception occured while fetching oauthtoken from db; Exception Message::Refresh token not provided!
+2020-05-29 13:04:53,772 - Client_Library_OAUTH - ERROR - Exception occured while fetching oauthtoken from db; Exception Message::Refresh token not provided!

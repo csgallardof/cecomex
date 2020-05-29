@@ -2,36 +2,44 @@ from zcrmsdk import ZCRMRecord ,ZCRMRestClient, ZCRMModule, ZohoOAuth
 import mysql.connector
 
 #Create Connection
-def start_connection(confs, grant_tk):
+def start_connection():
+    configuration_dictionary = { 
+        "sandbox":"false",
+        "currentUserEmail": "jefe.proyectos@cecomex.com",
+        "client_id": "1000.YVMNLP5AO3Q8TK6V0KI0H62P5X22QH",
+        "client_secret": "b3fc31536fb55e41140e7ddf1b38eecf8172fa611b",
+        "redirect_uri": "http://www.zoho.com",
+        "token_persistence_path": "./TokenPersistence"
+    }
+
     ZCRMRestClient.initialize(configuration_dictionary) 
 
     oauth_client = ZohoOAuth.get_client_instance()  
-    grant_token = grant_tk
+    grant_token="1000.02035858ddbe40a064547398d3eca6ec.dea2131577187ef68129a4159efea9e3" 
     oauth_tokens = oauth_client.generate_access_token(grant_token) 
     print(oauth_tokens.__dict__)
 
-#Scope: AAAServer.profile.read,ZohoCRM.Modules.All,ZohoCRM.Bulk.READ,ZohoCRM.org.all
-#Modules Scope: ZohoCRM.Modules.All
+    #Scope: AAAServer.profile.read,ZohoCRM.Modules.All,ZohoCRM.Bulk.READ,ZohoCRM.org.all
+    #Modules Scope: ZohoCRM.Modules.All
 
 
 #Create DB
-def create_db():
+def create_db(db_name, db_host, db_user, db_pass):
     mydb = mysql.connector.connect(
-        host = "127.0.0.1",
-        user = "root",
-        password = "bike1234567",
+        host = db_host,
+        user = db_user,
+        password = db_pass,
     )
 
     mycursor = mydb.cursor()
-    db_name = 'cecomex_2'
 
     mycursor.execute("CREATE DATABASE " + db_name)
 
     #Updata connection
     mydb = mysql.connector.connect(
-        host = "127.0.0.1",
-        user = "root",
-        password = "bike1234567",
+        host = db_host,
+        user = db_user,
+        password = db_pass,
         database = db_name)
 
     mycursor = mydb.cursor()
@@ -60,17 +68,28 @@ def create_db():
 
 
 #Consult and Insert
-def consult_insert(confs):    
+def consult_insert(db_name, db_host, db_user, db_pass): 
+    configuration_dictionary = { 
+    "sandbox":"false",
+    "applicationLogFilePath":"./logins",
+    "currentUserEmail": "jefe.proyectos@cecomex.com.ec",
+    "client_id": "1000.YVMNLP5AO3Q8TK6V0KI0H62P5X22QH",
+    "client_secret": "b3fc31536fb55e41140e7ddf1b38eecf8172fa611b",
+    "redirect_uri": "http://www.zoho.com",
+    "token_persistence_path": "./TokenPersistence"
+    }
+
     mydb = mysql.connector.connect(
-        host = "127.0.0.1",
-        user = "root",
-        password = "bike1234567",
-        database = "cecomex_2")
-    
+        host = db_host,
+        user = db_user,
+        password = db_pass,
+        database = db_name)
+
     ZCRMRestClient.initialize(configuration_dictionary)
     module_ins = ZCRMModule.get_instance('Accounts')  
     resp = module_ins.get_records()
-    
+    #print(resp.status_code)    #numero de clientes
+
     mycursor = mydb.cursor()
     sqlFormula = "INSERT INTO cliente (entity_id, owner_id, \
                 Fecha_Ult_Comp, Limite_de_Credito, Industry, Estado_del_Cliente, \
@@ -79,18 +98,18 @@ def consult_insert(confs):
                 Saldo_Pendiente, Correo_Facturacion, Transporte_preferido, Shipping_Street, \
                 Rating, Shipping_State, Phone, Account_Name, RUC) \
                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-    
+
     record_ins_arr = resp.data
     referece_ins = {}
     for ins in record_ins_arr:
         if len(ins.field_data) == 21:
             referece_ins = ins.field_data
-    
+
     campos_cliente = ['entity_id', 'owner_id']
     for key in referece_ins:
         if key != 'L_nea_de_Negocio' and key != 'Tag':
             campos_cliente.append(key)
-    
+
     for record_ins in record_ins_arr:
         cliente = (record_ins.entity_id, record_ins.owner.id)
         product = []
@@ -103,24 +122,17 @@ def consult_insert(confs):
                     product.append('null')
         cliente = cliente + tuple(product)        
         print(cliente)
-    
+
         mycursor.execute(sqlFormula, cliente)
         mydb.commit()
 
 
 if __name__ == "__main__":
-    grant_token = "1000.02035858ddbe40a064547398d3eca6ec.dea2131577187ef68129a4159efea9e3" 
+    db_name = 'cecomex_4'
+    host = "127.0.0.1"
+    user = "root"
+    password = "bike1234567"
 
-    configuration_dictionary = { 
-        "sandbox":"false",
-        "applicationLogFilePath":"./logins",
-        "currentUserEmail": "jefe.proyectos@cecomex.com",
-        "client_id": "1000.YVMNLP5AO3Q8TK6V0KI0H62P5X22QH",
-        "client_secret": "b3fc31536fb55e41140e7ddf1b38eecf8172fa611b",
-        "redirect_uri": "http://www.zoho.com",
-        "token_persistence_path": "./TokenPersistence"
-    }
-
-    #start_connection(configuration_dictionary, grant_token)
-    create_db()
-    consult_insert(configuration_dictionary)
+    #create_db()
+    #start_connection()
+    consult_insert(db_name, host, user, password)
