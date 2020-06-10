@@ -56,7 +56,7 @@ def create_db(db_name, db_host, db_user, db_pass):
                     Dias_Inactivos VARCHAR(255), Promedias_entre_compras VARCHAR(255), \
                     Dias_de_Pago_2 VARCHAR(255), Promedio_dias_de_vencimiento VARCHAR(255), \
                     Dias_factura_vencida_mora VARCHAR(255), Saldo_Pendiente VARCHAR(255), \
-                    Correo_Facturacion VARCHAR(255), \
+                    Shipping_City VARCHAR(255), \
                     Transporte_preferido VARCHAR(255), Shipping_Street VARCHAR(255), \
                     Rating VARCHAR(255), Shipping_State VARCHAR(255), \
                     Phone VARCHAR(255), Account_Name VARCHAR(255), RUC VARCHAR(255))")
@@ -95,7 +95,7 @@ def consult_insert(db_name, db_host, db_user, db_pass):
                 Fecha_Ult_Comp, Limite_de_Credito, Industry, Estado_del_Cliente, \
                 Promedio_de_Ventas_Mensual, Dias_Inactivos, Promedias_entre_compras, \
                 Dias_de_Pago_2, Promedio_dias_de_vencimiento, Dias_factura_vencida_mora, \
-                Saldo_Pendiente, Correo_Facturacion, Transporte_preferido, Shipping_Street, \
+                Saldo_Pendiente, Shipping_City, Transporte_preferido, Shipping_Street, \
                 Rating, Shipping_State, Phone, Account_Name, RUC) \
                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
 
@@ -128,11 +128,11 @@ def consult_insert(db_name, db_host, db_user, db_pass):
 
 
 if __name__ == "__main__":
-    db_name = 'cecomex_4'
+    db_name = 'cecomex_final'
     host = "127.0.0.1"
     user = "root"
     password = "bike1234567"
 
-    #create_db()
-    #start_connection()
+    create_db(db_name, host, user, password)
+    #start_connection()             #Para iniciar una nueva conexion, crear un grant token en zoho developers.
     consult_insert(db_name, host, user, password)
