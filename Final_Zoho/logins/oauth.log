@@ -124,3 +124,8 @@
 2020-05-29 13:04:53,770 - Client_Library_OAUTH - INFO - Access token expired hence refreshing; Exception Message::unsupported operand type(s) for -: 'NoneType' and 'int'
 2020-05-29 13:04:53,772 - Client_Library_OAUTH - ERROR - Exception occured while fetching oauthtoken from db; Exception Message::Refresh token not provided!
 2020-05-29 13:04:53,772 - Client_Library_OAUTH - ERROR - Exception occured while fetching oauthtoken from db; Exception Message::Refresh token not provided!
+2020-06-10 15:25:30,018 - Client_Library_OAUTH - INFO - Access token expired hence refreshing; Exception Message::Access token got expired!
+2020-06-10 16:37:14,318 - Client_Library_OAUTH - INFO - Access token expired hence refreshing; Exception Message::Access token got expired!
+2020-06-10 17:53:03,326 - Client_Library_OAUTH - INFO - Access token expired hence refreshing; Exception Message::Access token got expired!
+2020-06-10 18:56:47,750 - Client_Library_OAUTH - INFO - Access token expired hence refreshing; Exception Message::Access token got expired!
+2020-06-10 20:02:16,539 - Client_Library_OAUTH - INFO - Access token expired hence refreshing; Exception Message::Access token got expired!
