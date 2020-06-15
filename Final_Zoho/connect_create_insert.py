@@ -1,5 +1,6 @@
 from zcrmsdk import ZCRMRecord ,ZCRMRestClient, ZCRMModule, ZohoOAuth
 import mysql.connector
+import datetime
 
 #Create Connection
 def start_connection():
@@ -52,11 +53,11 @@ def create_db(db_name, db_host, db_user, db_pass):
     #Create Table
     mycursor.execute("CREATE TABLE cliente (Creado_por VARCHAR(255), \
                     Propietario_de_Cliente VARCHAR(255), Modificado_por VARCHAR(255), \
-                    Fecha_Ultima_Compra VARCHAR(255), Limite_de_Credito VARCHAR(255), Sector VARCHAR(255), \
-                    Estado_del_Cliente VARCHAR(255), Promedio_de_Ventas_Mensual VARCHAR(255), \
-                    Dias_Inactivos VARCHAR(255), Promedias_dias_entre_compras VARCHAR(255), \
-                    Dias_de_Pago VARCHAR(255), Promedio_de_dias_de_vencimiento VARCHAR(255), \
-                    Dias_factura_vencida_mora VARCHAR(255), Saldo_Pendiente VARCHAR(255), \
+                    Fecha_Ultima_Compra TIMESTAMP, Limite_de_Credito FLOAT, Sector VARCHAR(255), \
+                    Estado_del_Cliente VARCHAR(255), Promedio_de_Ventas_Mensual INTEGER, \
+                    Dias_Inactivos INTEGER, Promedias_dias_entre_compras FLOAT, \
+                    Dias_de_Pago INTEGER, Promedio_de_dias_de_vencimiento FLOAT, \
+                    Dias_factura_vencida_mora INTEGER, Saldo_Pendiente FLOAT, \
                     Ciudad_de_envio VARCHAR(255), Correo_electronico_facturacion VARCHAR(255),\
                     Transporte_preferido VARCHAR(255), Domicilio_de_envio VARCHAR(255), \
                     Descripcion VARCHAR(255),\
@@ -69,6 +70,29 @@ def create_db(db_name, db_host, db_user, db_pass):
     mycursor.execute("SHOW TABLES")
     for tb in mycursor:
         print(tb)
+
+
+def return_value(column):
+    int_values = ['D_as_Inactivos', 'D_as_de_Pago_2', 'D_as_factura_vencida_mora', 'created_by', 'owner_id', 'modified_by']
+    str_values = ['Industry', 'Estado_del_Cliente', 'Shipping_City', 'Correo_electr_nico_Facturaci_n', 'Transporte_preferidoEdit', 'Shipping_Street', 'Description', 'Rating', 'Shipping_State', 'Website', 'Correo_electr_nico', 'Phone', 'Account_Name', 'RUC', 'Alerta', 'L_nea_de_Negocio']
+    flt_values = ['Promedio_d_as_entre_compras', 'Promedio_de_D_as_de_vencimiento', 'Saldo_Pendiente', 'Promedio_de_Ventas_Mensual', 'L_mite_de_Cr_dito']
+    time_value = ['Fecha_ltima_compra1']
+    if column in int_values:
+        value = 0
+    elif column in flt_values:
+        value = 0.0
+    elif column in time_value:
+        value = '1999-9-9'
+    else:
+        value = 'null'
+    return value
+
+#Format Date
+def formate_date(fecha):
+    value = 0
+    fecha_temp = datetime.datetime.strptime(fecha, '%Y-%m-%d')
+    value = fecha_temp.date() 
+    return value 
 
 
 #Consult and Insert
@@ -121,11 +145,16 @@ def consult_insert(db_name, db_host, db_user, db_pass):
         product = []
         product_data = record_ins.field_data
         for column in campos_cliente:
-            value = 'null'
-            if column != 'created_by' and column != 'owner_id' and column != 'modified_by':
+            value = return_value(column)
+            if column != 'created_by' and column != 'owner_id' and column != 'modified_by' and column != 'Fecha_ltima_compra1':
                 for key in product_data:
                     if key == column:
                         value = product_data[key]
+                product.append(str(value))
+            if column == 'Fecha_ltima_compra1':
+                for key in product_data:
+                    if key == 'Fecha_ltima_compra1':
+                        value = formate_date(product_data[key])
                 product.append(str(value))
         cliente = cliente + tuple(product)        
         #print(cliente)
@@ -134,7 +163,7 @@ def consult_insert(db_name, db_host, db_user, db_pass):
 
 
 if __name__ == "__main__":
-    db_name = 'cecomex_final_zasdf'
+    db_name = 'cecomex_12111'
     host = "127.0.0.1"
     user = "root"
     password = "bike1234567"
