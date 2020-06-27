@@ -1,13 +1,14 @@
-from zcrmsdk import ZCRMRecord ,ZCRMRestClient, ZCRMModule, ZohoOAuth
 import mysql.connector
 import itertools
+
+from zcrmsdk import ZCRMRecord ,ZCRMRestClient, ZCRMModule, ZohoOAuth
 
 if __name__ == "__main__":
     db_name = 'cecomex_final'
     host = "localhost"
     user = "root"
-    password = ""
-    conn = mysql.connector.connect(host="localhost",database="cecomex_final",user="root",passwd="")
+    password = "#C3c0meX"
+    conn = mysql.connector.connect(host="localhost",database="cecomex_final",user="root",passwd=password)    
     c= conn.cursor()
 
 
@@ -49,7 +50,7 @@ if __name__ == "__main__":
     'Shipping_State', 'Website', 'Correo_electr_nico', 'Phone', \
     'Account_Name', 'Zona', 'Referencia', 'R_gimen_Fiscal','RUC_CI']
     
-    conn = mysql.connector.connect(host="localhost",database="cecomex_final",user="root",passwd="")
+    conn = mysql.connector.connect(host="localhost",database="cecomex_final",user=user,passwd=password)
     c= conn.cursor()
     
     configuration_dictionary = { 

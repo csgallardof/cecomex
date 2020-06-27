@@ -1,7 +1,8 @@
 import mysql.connector
 import pyodbc
 
-conn = mysql.connector.connect(host="localhost",database="cecomex_final",user="root",passwd="")
+conn = mysql.connector.connect(host="localhost",database="cecomex_final",user="root",passwd="#C3c0meX")
+    
 c= conn.cursor()
 """
 0.Account_Name

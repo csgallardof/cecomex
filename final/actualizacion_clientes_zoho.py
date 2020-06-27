@@ -308,7 +308,7 @@ tablaPrin=tablaPrin.fillna(0)
 #tablaPrin.to_csv(r'C:\Users\jefe.proyectos\Documents\Tablas MBA\Para sincronizar\estadoClientes.csv', index = False)
 #tablaPrin.to_excel(r'C:\Users\jefe.proyectos\Documents\Tablas MBA\Para sincronizar\estadoClientes.xlsx')
 import mysql.connector
-conn = mysql.connector.connect(host="localhost",database="cecomex_final",user="root",passwd="")
+conn = mysql.connector.connect(host="localhost",database="cecomex_final",user="root",passwd="#C3c0meX")
 c= conn.cursor()
 data=tablaPrin[['RUC/CI','Fecha última compra','Días factura vencida (mora)','Saldo Pendiente','Promedio de Días de vencimiento','Promedio días entre compras','Promedio de Ventas Mensual']].to_numpy()
 print('mysql')
