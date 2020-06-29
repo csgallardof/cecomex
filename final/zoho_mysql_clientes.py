@@ -3,20 +3,22 @@ import itertools
 
 from zcrmsdk import ZCRMRecord ,ZCRMRestClient, ZCRMModule, ZohoOAuth
 
+# ETL ZohoCRM - Python - MySQL
+
 if __name__ == "__main__":
+    # Conexion BD (MySQL)
     db_name = 'cecomex_final'
     host = "localhost"
     user = "root"
     password = "#C3c0meX"
     conn = mysql.connector.connect(host="localhost",database="cecomex_final",user="root",passwd=password)    
     c= conn.cursor()
-
-
     
     c.execute("select RUC from cliente")
     mydb=c.fetchall()
     ruc=list(itertools.chain(*mydb))
 
+    # Insertar registros dentro de la base de datos 
     insertFormula = "INSERT INTO cliente (entity_id, owner_id, \
                 Fecha_Ult_Comp, Limite_de_Credito, Industry, Estado_del_Cliente, \
                 Promedio_de_Ventas_Mensual, Dias_Inactivos, Promedias_entre_compras, \
@@ -40,6 +42,8 @@ if __name__ == "__main__":
                 Shipping_State=%s, Website=%s, Correo_electronico=%s,\
                 Phone=%s, Account_Name=%s ,ZONA=%s, Referencia=%s, Regimen_Fiscal=%s\
                 where RUC=%s"
+    
+    # Columnas referenciadas de la tabla Cliente 
     campos_cliente = ['entity_id', 'owner_id', 'Fecha_ltima_compra1',\
     'L_mite_de_Cr_dito', 'Industry', 'Estado_del_Cliente',\
     'Promedio_de_Ventas_Mensual', 'D_as_Inactivos',\
@@ -50,33 +54,35 @@ if __name__ == "__main__":
     'Shipping_State', 'Website', 'Correo_electr_nico', 'Phone', \
     'Account_Name', 'Zona', 'Referencia', 'R_gimen_Fiscal','RUC_CI']
     
+    # Credenciales MySQL BD
     conn = mysql.connector.connect(host="localhost",database="cecomex_final",user=user,passwd=password)
     c= conn.cursor()
     
+    # Credenciales ZohoCRM
     configuration_dictionary = { 
     "sandbox":"false",
-    "applicationLogFilePath":"./logins",
+    "applicationLogFilePath":"./logins",                                    # Registro de ingresos a ZohoCRM
     "currentUserEmail": "jefe.proyectos@cecomex.com.ec",
     "client_id": "1000.YVMNLP5AO3Q8TK6V0KI0H62P5X22QH",
     "client_secret": "b3fc31536fb55e41140e7ddf1b38eecf8172fa611b",
     "redirect_uri": "http://www.zoho.com",
-    "token_persistence_path": "./TokenPersistence"
+    "token_persistence_path": "./TokenPersistence"                          # Token de persistencia que permite generar un nuevo token de acceso a ZohoCRM
     }
 
-    
+    # Extraccion de datos (Accounts) de ZohoCRM
     ZCRMRestClient.initialize(configuration_dictionary)
     module_ins = ZCRMModule.get_instance('Accounts')  
     #resp = module_ins.get_records()
     
-    
+    # Iterar por los registros de ZohoCRM(Accounts) clientes
     for i in range(0,1000):
         try:
-            resp = module_ins.get_records(page=i)
-            for record_ins in resp.data:
-                cliente = (record_ins.entity_id, record_ins.owner.id)
-                product = []
-                product_data = record_ins.field_data
-                for column in campos_cliente:
+            resp = module_ins.get_records(page=i)                           # Seleccionar todas las paginas del CRM
+            for record_ins in resp.data:                                    # Iterar por pagina
+                cliente = (record_ins.entity_id, record_ins.owner.id)       # ID de la entidad y propietario
+                product = []                                                # Lista temporal
+                product_data = record_ins.field_data                        # Tomar los campos de ZohoCRM (Account)
+                for column in campos_cliente:                               # Extraer campos de cliente (Account)
                     value = 'null'
                     if column != 'entity_id' and column != 'owner_id':
                         for key in product_data:
