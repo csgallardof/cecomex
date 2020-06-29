@@ -5,6 +5,7 @@ conn = mysql.connector.connect(host="localhost",database="cecomex_final",user="r
     
 c= conn.cursor()
 """
+Indeces de elementos retomados en la consulta mysql
 0.Account_Name
 1.RUC
 2.Industry -> CODIGO_GIRO
@@ -28,7 +29,7 @@ c.execute("select Account_Name,RUC,Industry,owner_id,Phone,Shipping_State,\
 	Shipping_Street,Transporte_preferido,Rating, 	Limite_de_Credito , \
 	Dias_de_Pago, Correo_Electronico_Fact,Correo_electronico,  \
 	Shipping_City,alert,ZONA,Regimen_Fiscal,Referencia from cliente")
-mydb=c.fetchall()
+mydb=c.fetchall() #obtener todos los elementos mysql
 
 conmba = pyodbc.connect('DSN=MBAV17')
 curs = conmba.cursor()
@@ -43,26 +44,29 @@ select=curs.fetchall()
 #blacklist={}
 
 for i in select:
-	exists[i[0]]=i[1]
+	exists[i[0]]=i[1] #guarda el  ruc como key  y el codigo mba como value
 	code.append(i[1])
 	#if i[1][0:2]!='C0': 
 		#blacklist[i[0]]=i[1]
-code=list(filter(lambda i:'C0' ==i[0:2],code)) 
-code.sort()
-code.reverse()
-id=int(code[0][1:])+1
+code=list(filter(lambda i:'C0' ==i[0:2],code)) #revisa que los codigo inicie con C0 
+code.sort() # Ordena lso codigos
+code.reverse() # Ordena de mayor a menor
+id=int(code[0][1:])+1 # Obtiene el ultimo id +1
 print(id)
+
+#Obtener codigos de categorias mba
 curs.execute("select (CODE),(DESCRIPTION_ENG) from SIST_Lista_6 WHERE CORP='CECO2' AND GROUP_CATEGORY='GIRNE'")
 sis6=curs.fetchall()
 industry={}
 for i in sis6:
-	industry[i[1]]=i[0]
+	industry[i[1]]=i[0] #la descripcion es el valor y el codigo la key
 
+#Obtener codigos transporte
 curs.execute("select (CODE),(TEXTO1_20) from SIST_Lista_3 WHERE CORP='CECO2' AND `GROUP CATEGORY`='TRANS'")
 sis3=curs.fetchall()
 transport={}
 for i in sis3:
-	transport[i[1]]=i[0]
+	transport[i[1]]=i[0] #TEXTO1_20 es el codigo y el valor el CODE
 indus=None
 trans=None
 
@@ -70,42 +74,34 @@ count=0
 print("Start wrting MBA")
 for i in mydb:
 	try:
-		indus=industry[i[2]]
+		indus=industry[i[2]] #conseguir la industria si existe en MBA
 	except:
 		indus=i[2]
 	try:
-		trans=transport[i[7]]
+		trans=transport[i[7]] #conseguir TRANSPORTE si existe en MBA
 	except:
 		trans=i[7]
 
-	if  i[1] in exists.keys():
+	if  i[1] in exists.keys(): #Si existe actualizar
 		query="UPDATE CLNT_FICHA_PRINCIPAL SET\
 		SUCURSAL='PRI',Codigo_Cuenta_Contable_Cliente='10100200001',\
 		CODIGO_TRANSPORTE_DESP='%s',CODIGO_GIRO='%s',\
 		TELEFONO='%s',ESTADO='%s',\
 		DIRECCION_DESPACHO_1='%s',DIRECCION_PRINCIPAL_1='%s',CLIENT_TYPE='%s', LIMITE_CREDITO=%s,\
-		TERMINOS_DE_PAGO_DIAS=%s,TERMINOS_DE_PAGO_ALFA_NUM='%s' , EMPRESA='CECO2',E_MAIL='%s',\
+		TERMINOS_DE_PAGO_DIAS=%s,TERMINOS_DE_PAGO_ALFA_NUM='%s',E_MAIL='%s',\
 		CIUDAD_DESPACHO='%s',CIUDAD_PRINCIPAL='%s',NOMBRE_CLIENTE='%s',ZONA='%s', Codigo_RegimenFiscal='%s', Referencia_s='%s'\
-		WHERE CODIGO_CLIENTE='%s'"\
+		WHERE IDENTIFICACION_FISCAL='%s' AND CODIGO_CLIENTE='%s' AND EMPRESA='CECO2'"\
 		%(trans.upper(),indus.upper(),i[4].upper(),i[5].upper(),\
 			i[6].upper(),i[6].upper(),i[8].upper(),i[9].upper(),\
-			i[10].upper(),str(i[10])+' DIAS',i[12],i[13].upper(),i[13].upper(),i[0].upper(),i[15],i[16],i[17],exists[i[1]])
+			i[10].upper(),str(i[10])+' DIAS',i[12],i[13].upper(),i[13].upper(),i[0].upper(),i[15],i[16],i[17],i[1],exists[i[1]])
 		#print(query)
 		try:
 			curs.execute(query)
 		except:
 			print(query)
-		"""
-		try: 
-			codex='C'+str(id+10000000)[1:]
-			query="UPDATE CLNT_FICHA_PRINCIPAL SET SUCURSAL='Principal - Matriz',Codigo_Cuenta_Contable_Cliente='10100200001',CODIGO_CLIENTE='%s',CODIGO_TRANSPORTE_DESP='%s',CODIGO_GIRO='%s',TELEFONO='%s',ESTADO='%s',DIRECCION_DESPACHO_1='%s',CLIENT_TYPE='%s', LIMITE_CREDITO=%s, TERMINOS_DE_PAGO_DIAS=%s , EMPRESA='CECO2',Email_Fiscal='%s' WHERE IDENTIFICACION_FISCAL='%s'"%(codex,trans,indus,i[4],i[5],i[6],i[7],i[9],i[10],i[11],i[1])
-			id+=1	
-		except:
-			False
-		"""
 		
-	else:	
-		codex='C'+str(id+10000000)[1:]
+	else:	#No existe insertar
+		codex='C'+str(id+10000000)[1:] #Crea un nuevo codigo
 		exists[i[1]]=codex
 		codigo=codex+'-CECO2'
 		query="INSERT INTO CLNT_FICHA_PRINCIPAL (SUCURSAL,Codigo_Cuenta_Contable_Cliente,\
@@ -121,8 +117,8 @@ for i in mydb:
 		%s,'%s','%s','%s','%s','%s','%s','US',\
 		'%s','%s','%s')"\
 		%(codex,i[0].upper(),i[1].upper(),i[4].upper(),i[5].upper(),i[6].upper(),i[6].upper(),i[8].upper(),trans.upper(),indus.upper(),i[9].upper(),i[10],str(i[10])+' DIAS',i[11],i[12],i[13].upper(),i[13].upper(),codigo,i[15],i[16],i[17])
-		id=id+1
-		curs.execute(query)
+		id=id+1 #suma uno al id para la siguiente insertacion
+		curs.execute(query) 
 		print(query)
 
 	count+=1
@@ -130,8 +126,6 @@ for i in mydb:
 		print(query,' numero ',count)
 
 
-	if i[1]=="1308941416001" or i[1]=="1708514847001" or  i[1]=="1333333330001":
-		print(i[1],query)
 		#Codigo_Cuenta_Contable_Cliente: '10100200001'
 		#SUCURSAL: 'Principal - Matriz'
 		#EMPRESA: 'CECO2'

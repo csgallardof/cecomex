@@ -310,9 +310,23 @@ tablaPrin=tablaPrin.fillna(0)
 import mysql.connector
 conn = mysql.connector.connect(host="localhost",database="cecomex_final",user="root",passwd="#C3c0meX")
 c= conn.cursor()
+#Obtener ids del mysql 
+selectsql="select RUC,entity_id from cliente"        
+c.execute(selectsql)
+select=c.fetchall()
+
+#crear un diccionario donde la llave sea el ruc y el valor el codigo del cliente zoho
+codigo={}
+for i in select:
+    codigo[i[0]]=i[1]
+
+listruc=[]
+
+#Covertir dataframe to numpy array
 data=tablaPrin[['RUC/CI','Fecha última compra','Días factura vencida (mora)','Saldo Pendiente','Promedio de Días de vencimiento','Promedio días entre compras','Promedio de Ventas Mensual']].to_numpy()
 print('mysql')
 
+#Conexion zoho
 configuration_dictionary = { 
     "sandbox":"false",
     "applicationLogFilePath":"./logins",
@@ -326,23 +340,14 @@ configuration_dictionary = {
     
 ZCRMRestClient.initialize(configuration_dictionary)
 
-selectsql="select RUC,entity_id from cliente"        
-c.execute(selectsql)
-select=c.fetchall()
-
-codigo={}
-for i in select:
-    codigo[i[0]]=i[1]
-
-listruc=[]
+#Actualizacion de data
 for ruc,f,df,sp,dv, dc,vm in data:
-    if ruc in codigo.keys():
+    if ruc in codigo.keys(): #Actualiza con RUCS existentes en zoho
+        #Actualizar mysql
         sql="update cliente set Fecha_Ult_Comp=%s,Dias_factura_vencida_mora=%s,Saldo_Pendiente=%s,Promedio_dias_de_vencimiento=%s, Promedias_entre_compras=%s,Promedio_de_Ventas_Mensual=%s where RUC='%s'"%(f,df,sp,dv,dc,vm,ruc)
-        
-        #c.execute(sql)
-
-        codex=codigo[str(ruc)]
-        record=ZCRMRecord.get_instance('Accounts',codex)
+        codex=codigo[str(ruc)] #Conseguir codigo del cliente en zoho
+        #Actualiza campos en el zoho
+        record=ZCRMRecord.get_instance('Accounts',codex) 
         record.set_field_value('Fecha_ltima_compra1', str(f))
         record.set_field_value('D_as_factura_vencida_mora', int(df))
         record.set_field_value('Saldo_Pendiente', round(sp,2))
@@ -353,12 +358,7 @@ for ruc,f,df,sp,dv, dc,vm in data:
         resp=record.update()
     else:
         listruc.append(ruc)
-        print(ruc)
-            #print(ruc)
-        
-        #print('ruc %s'%ruc)
-    #    print('error '+sql) 
-     #print(ruc,dv,dc,vm)
+        print(ruc) #imprime rucs que no existen en el zoho, y los guarda en la lista
 conn.commit()
 print('Listo!')
 
